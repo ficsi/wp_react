@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root-private"></div>
+
+    <script>
+		fetch("https://private.local/wp-json/wc/v3/products", {
+			method: "GET",
+			headers: {
+				Authorization: "Basic " + btoa("ck_9504c8271e58bf3d0cbca700dbf57cda2b88f2e3:cs_8be53dbeb47b8b6bf14f80515dccbf9173e6fde3")
+			}
+		})
+			.then(response => response.json())
+			.then(data => console.log(data))
+			.catch(error => console.error("Error fetching products:", error));
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+
+button {
+  border: none;
+  z-index: 9;
+
+  padding: 10px 20px;
+  text-transform: uppercase;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #ffffff80;
+  text-shadow: none;
+  background: transparent;
+  cursor: pointer;
+  box-shadow: transparent;
+  transition: 0.5s ease;
+  user-select: none;
+}
+
+#btn:hover,
+:focus {
+  color: rgba(255,255,0,0.9);
+  border-bottom: 2px solid #ffbf00!important;
+}

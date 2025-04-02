@@ -1,0 +1,16 @@
+.container {
+  display: block;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 5%;
+  box-sizing: border-box;
+}
+
+.flex {
+  display: flex;
+
+  &:nth-child(even) {
+  flex-direction: row-reverse;
+  }
+}
