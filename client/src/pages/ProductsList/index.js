@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from 'react'
 import './item.scss';
 import {createPortal} from "react-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {createOrder} from "../../store/slices/orderReducer";
 
 export default function ProductsList(data) {
 	const {loading, products} = data;
 	const [modalData, setModalData] = useState(null);
+
+	const dispatch = useDispatch();
+	const user = useSelector((state) => state.user.user);
+	const orderStatus = useSelector((state) => state.order.status);
 
 	useEffect(() => {
 		console.log(loading);
@@ -20,7 +26,18 @@ export default function ProductsList(data) {
 				document.querySelector('.listing-container'))
 		)
 	}
+
+	const handlePurchase = (productId) => {
+		if (!user) {
+			alert("Please log in first!");
+			return;
+		}
+		console.log(user)
+		dispatch(createOrder(user.id, productId));
+	};
+
 	const Item = (data) => {
+		console.log(data)
 		return (
 			<div className="card shadow">
 				<div className="card-body">
@@ -28,6 +45,9 @@ export default function ProductsList(data) {
 				</div>
 				<div className="span text-center" onClick={() => setModalData(data)}>Бърз преглед
 				</div>
+				<span onClick={() => handlePurchase(data.item.id)} disabled={orderStatus === "loading"}>
+					{orderStatus === "loading" ? "Processing..." : "Buy Now"}
+				</span>
 			</div>
 		)
 	}
@@ -43,7 +63,7 @@ export default function ProductsList(data) {
 						<Item item={item}/>
 					</div>,
 				)}
-			{modalData && <ModalRender data={modalData} />}
+			{modalData && <ModalRender data={modalData}/>}
 		</div>
 	)
 }

@@ -5,6 +5,8 @@ import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
 import Login from "./pages/Login";
 import ProductsList from "./pages/ProductsList";
 import Navbar from "./component/navigation";
+import {Provider} from "react-redux";
+import {store} from "./store";
 
 function App() {
 	const [products, setProducts] = useState([]);
@@ -25,14 +27,16 @@ function App() {
 			.catch(error => console.error("Error fetching products:", error));
 	}, []);
 	return (
-		<BrowserRouter>
-			<Navbar />
-			<Routes>
-				<Route path="/" element={<Home/>}/>
-				<Route path="/login" element={<Login/>}/>
-				<Route path="/products" element={<ProductsList loading={loading} products={products}/>}/>
-			</Routes>
-		</BrowserRouter>
+		<Provider store={store}>
+			<BrowserRouter>
+				<Navbar/>
+				<Routes>
+					<Route path="/" element={<Home/>}/>
+					<Route path="/login" element={<Login/>}/>
+					<Route path="/products" element={<ProductsList loading={loading} products={products}/>}/>
+				</Routes>
+			</BrowserRouter>
+		</Provider>
 	);
 }
 

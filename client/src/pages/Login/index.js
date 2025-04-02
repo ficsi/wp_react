@@ -1,5 +1,7 @@
 import './index.scss';
 import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from "react-redux";
+import {fetchUser, setUser} from "../../store/slices/userSlice";
 
 
 export default function Login() {
@@ -7,13 +9,12 @@ export default function Login() {
 	const [password, setPassword] = useState("");
 	const [token, setToken] = useState("");
 	const [error, setError] = useState(null);
-	const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-	const [userRole, setUserRole] = useState(null);
+	const [isUser, setIsUser] = useState(false);
+	const userData = useSelector(state => state.user);
+	const dispatch = useDispatch();
 
-
-	const handleLogin = async (e) => {
+	const setTokenAuth = async (e) => {
 		e.preventDefault();
-
 		try {
 			const response = await fetch("https://private.local/wp-json/jwt-auth/v1/token", {
 				method: "POST",
@@ -31,55 +32,34 @@ export default function Login() {
 			setToken(data.token);
 			localStorage.setItem("jwt", data.token);
 			setError(null);
-			setIsUserLoggedIn(true);
+
 		} catch (e) {
 			setError("Network error. Try again.");
 		}
 	};
 
-	const handleGreetUser = async () => {
-
-		try {
-			const response = await fetch("https://private.local/wp-json/wp/v2/users/me", {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-					"Authorization": `Bearer ${token}`,
-				},
-			});
-			if (!response.ok) {
-				return;
-			}
-			const data = await response.json();
-			console.log(data)
-			return setUserRole(data);
-		} catch (e) {
-			console.log(e)
-		}
-	}
+	useEffect(() => {
+		dispatch(fetchUser(token));
+	}, [token, dispatch]);
 
 	useEffect(() => {
-		if (token) {
-			handleGreetUser();
-		}
-	}, [token]);
+		const {user, status, error} = userData;
+		setIsUser(status === "succeeded");
+	}, [userData]);
+
 	const GreetUser = () => {
-		console.log(userRole);
-		if (!userRole) {
-			return
-		}
 		return (
-			<h1>Welcome, {userRole.name}</h1>
+			<h1 className={'container'}>Welcome, {userData.user.name}</h1>
 		)
 	}
 	return (
-		!isUserLoggedIn ?
+		!isUser ?
 			<div className="login-container">
 				<div className="heading">Sign in to your account</div>
 
 				{error && <p style={{color: "red"}}>{error}</p>}
 
-				<form className="form" onSubmit={handleLogin}>
+				<form className="form" onSubmit={setTokenAuth}>
 					<div className="input-field">
 						<input
 							required

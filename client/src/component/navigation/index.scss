@@ -12,11 +12,16 @@
   background: linear-gradient(90deg, #8B0000 -100%, rgb(2, 0, 36) 100%, #000 100%);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 
+  span#btn{
+    box-sizing: content-box;
+  }
   #btn {
     background: rgb(2,0,36);
     border: none;
     border-radius: 0;
     height: 100%;
+    color: #ccc;
+    align-content: center;
     &:hover{
 
     }
