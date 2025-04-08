@@ -5,11 +5,13 @@ import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
 import Login from "./pages/Login";
 import ProductsList from "./pages/ProductsList";
 import Navbar from "./component/navigation";
-import {Provider} from "react-redux";
+import {Provider, useSelector} from "react-redux";
+import {store} from "./store";
 
 function App() {
 	const [products, setProducts] = useState([]);
 	const [loading, setLoading] = useState(true); // Track loading state
+	const user = useSelector((state) => state.user.user);
 
 	useEffect(() => {
 		fetch("https://private.local/wp-json/wc/v3/products", {

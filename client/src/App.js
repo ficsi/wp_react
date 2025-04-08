@@ -5,7 +5,7 @@ import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
 import Login from "./pages/Login";
 import ProductsList from "./pages/ProductsList";
 import Navbar from "./component/navigation";
-import {Provider} from "react-redux";
+import {Provider, useSelector} from "react-redux";
 import {store} from "./store";
 
 function App() {

@@ -1,18 +1,20 @@
 import './index.scss';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchUser, setUser} from "../../store/slices/userSlice";
-
+import {fetchOrders, fetchUser} from "../../store/slices/userSlice";
 
 export default function Login() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [token, setToken] = useState("");
 	const [error, setError] = useState(null);
-	const [isUser, setIsUser] = useState(false);
-	const userData = useSelector(state => state.user);
-	const dispatch = useDispatch();
 
+	const dispatch = useDispatch();
+	const userData = useSelector(state => state.user);
+	const previousOrders = useSelector(state => state.user.previousOrders);
+	const isUser = userData.status === "succeeded";
+
+	// Attempt login and set token
 	const setTokenAuth = async (e) => {
 		e.preventDefault();
 		try {
@@ -23,37 +25,63 @@ export default function Login() {
 			});
 
 			const data = await response.json();
-
 			if (!response.ok) {
 				setError(data.message || "Login failed");
 				return;
 			}
 
 			setToken(data.token);
-			localStorage.setItem("jwt", data.token);
+			localStorage.setItem("jwt_token", data.token);
+			localStorage.setItem("jwt_exp", Date.now() + 1000 * 60 * 60 * 24 * 7);
 			setError(null);
-
-		} catch (e) {
+		} catch {
 			setError("Network error. Try again.");
 		}
 	};
 
+	// On token update, fetch user
 	useEffect(() => {
-		dispatch(fetchUser(token));
+		if (token) dispatch(fetchUser(token));
 	}, [token, dispatch]);
 
+	// Fetch orders once user is loaded
 	useEffect(() => {
-		const {user, status, error} = userData;
-		setIsUser(status === "succeeded");
-	}, [userData]);
+		if (isUser && userData.user?.id) {
+			dispatch(fetchOrders({token, userId: userData.user.id}));
+		}
+	}, [isUser, userData.user?.id, token, dispatch]);
 
-	const GreetUser = () => {
-		return (
-			<h1 className={'container'}>Welcome, {userData.user.name}</h1>
-		)
-	}
+	// Check stored token on mount
+	useEffect(() => {
+		const storedToken = localStorage.getItem("jwt_token");
+		const expiry = localStorage.getItem("jwt_exp");
+
+		if (storedToken && expiry && Date.now() < parseInt(expiry)) {
+			setToken(storedToken);
+		} else {
+			localStorage.removeItem("jwt_token");
+			localStorage.removeItem("jwt_exp");
+		}
+	}, []);
+
+	// Greeting block
+	const GreetUser = () => (
+		<div className="container">
+			<h1>Welcome, {userData.user.name}</h1>
+			{previousOrders && previousOrders.length > 0 ? (
+				<>
+					<h2>Your Orders:</h2>
+					{previousOrders.map((order) => (
+						<p key={order.id}>Order #{order.id} - Total: {order.total} {order.currency}</p>
+					))}
+				</>
+			) : <p>No orders found.</p>}
+		</div>
+	);
+
+	// Login form
 	return (
-		!isUser ?
+		!isUser ? (
 			<div className="login-container">
 				<div className="heading">Sign in to your account</div>
 
@@ -70,7 +98,7 @@ export default function Login() {
 							value={username}
 							onChange={(e) => setUsername(e.target.value)}
 						/>
-						<label htmlFor="username">Full Name</label>
+						<label htmlFor="username">Username</label>
 					</div>
 
 					<div className="input-field">
@@ -94,6 +122,6 @@ export default function Login() {
 					</div>
 				</form>
 			</div>
-			: <GreetUser/>
+		) : <GreetUser />
 	);
 }

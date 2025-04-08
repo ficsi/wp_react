@@ -6,6 +6,9 @@ import {fetchUser, setUserLogStatus} from "../../store/slices/userSlice";
 export default function NavInfo() {
 	const [userName, setUserName] = useState(null);
 	const userData = useSelector((state) => state.user.user);
+	const dispatch = useDispatch();
+
+
 	useEffect(() => {
 		if(userData !== null) {
 			setUserName(userData.name);
@@ -17,6 +20,15 @@ export default function NavInfo() {
 		<Link to="/login">
 			<button id="btn">Вход за фирми</button>
 		</Link>
-		: <span id="btn">{userName}</span>
+		: <span id="btn">
+				{userName}
+				<button onClick={() => {
+					localStorage.removeItem("jwt_token");
+					localStorage.removeItem("jwt_exp");
+					dispatch(setUserLogStatus(false));
+					dispatch(fetchUser(null));
+					setUserName(null);
+				}}>Изход</button>
+		</span>
 	)
 }

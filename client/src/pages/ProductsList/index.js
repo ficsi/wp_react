@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import './item.scss';
 import {createPortal} from "react-dom";
 import {useDispatch, useSelector} from "react-redux";
@@ -9,12 +9,8 @@ export default function ProductsList(data) {
 	const [modalData, setModalData] = useState(null);
 
 	const dispatch = useDispatch();
-	const user = useSelector((state) => state.user.user);
+	const user = useSelector((state) => state.user);
 	const orderStatus = useSelector((state) => state.order.status);
-
-	useEffect(() => {
-		console.log(loading);
-	}, [data]);
 
 	const ModalRender = (data) => {
 		return (
@@ -27,17 +23,19 @@ export default function ProductsList(data) {
 		)
 	}
 
-	const handlePurchase = (productId) => {
-		if (!user) {
+	const handlePurchase = useCallback(
+
+	(productId) => {
+		// console.log(user);
+		if (!user.isLogged) {
 			alert("Please log in first!");
 			return;
 		}
-		console.log(user)
-		dispatch(createOrder(user.id, productId));
-	};
+		dispatch(createOrder(user.user.id, productId));
+	},[user, dispatch]);
 
 	const Item = (data) => {
-		console.log(data)
+		// console.log(data)
 		return (
 			<div className="card shadow">
 				<div className="card-body">
